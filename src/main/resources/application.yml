@@ -1,0 +1,54 @@
+spring:
+  jackson:
+    default-property-inclusion: non_null # json ignore null
+
+
+
+  datasource:
+    url: jdbc:mysql://${DATABASE_URL:localhost}:3306/twitch?createDatabaseIfNotExist=true
+    username: ${DATABASE_USERNAME:root}
+    password: ${DATABASE_PASSWORD:secret}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  sql:
+    init:
+      mode: ${INIT_DB:always} # always clean the database after starting the application
+      schema-locations: "classpath:database-init.sql"
+  cache:
+    caffeine:
+      spec: expireAfterWrite=5s
+
+
+
+  cloud:
+    openfeign:
+      oauth2:
+        enabled: true
+        clientRegistrationId: twitch
+      client:
+        config:
+          twitch-api:
+            url: https://api.twitch.tv/helix
+            loggerLevel: basic
+            default-request-headers:
+              Client-Id: "y8dwb0ovzo7sbzr5k1qx41r7rszy6p"
+  security:
+    oauth2:
+      client:
+        registration:
+          twitch:
+            authorization-grant-type: client_credentials
+            client-authentication-method: client_secret_post
+            client-id: "y8dwb0ovzo7sbzr5k1qx41r7rszy6p"
+            client-secret: "4ahhxm79nuq911jey7fxoiqdm2w5tw"
+        provider:
+          twitch:
+            token-uri: https://id.twitch.tv/oauth2/token
+
+
+
+logging:
+  level:
+    org.apache.coyote.http11.Http11InputBuffer: DEBUG # Incoming HTTP requests
+    com.example.twitch.external.TwitchApiClient: DEBUG
+    org.springframework.jdbc.core: DEBUG # SQL
+
